@@ -1,27 +1,64 @@
+import { fetchImages } from 'api/api';
 import { Component } from 'react';
 import Button from './Button';
 import ImageGallery from './ImageGallery';
+import { Loader } from './Loader';
 import SearchBar from './Searchbar';
-
-const BASE_URL =
-  'https://pixabay.com/api/?q=cat&page=1&key=38662933-763155843aa83bb37fcf566da&image_type=photo&orientation=horizontal&per_page=12';
-
 export class App extends Component {
   state = {
     gallery: null,
+    filtedGalery: null,
+    query: '',
+    page: 1,
     err: '',
     isLoading: true,
   };
-  async fetchImages(params) {
-    const data = await fetch(BASE_URL);
-    return data.json();
+  handleLoadMore = () => {
+    this.setState(prev => ({ page: prev.page + 1 }));
+  };
+
+  hangleSearch = e => {
+    this.setState({ query: e, page: 1 });
+  };
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.page !== this.state.page) {
+      this.setState({ isLoading: true });
+      fetchImages(this.state.page, this.state.query).then(data => {
+        setTimeout(() => {
+          prevState.query !== this.state.query
+            ? this.setState({ gallery: data.hits })
+            : this.setState(prev => ({
+                gallery: [...prev.gallery, ...data.hits],
+              }));
+
+          this.setState({ isLoading: false });
+        }, 1000);
+      });
+    } else if (prevState.query !== this.state.query) {
+      this.setState({ isLoading: true });
+      fetchImages(this.state.page, this.state.query).then(({ hits }) => {
+        setTimeout(() => {
+          this.state.query
+            ? this.setState({ gallery: hits })
+            : this.setState({ gallery: [] });
+
+          this.setState({ isLoading: false });
+        }, 1000);
+      });
+    }
   }
 
   componentDidMount() {
-    this.fetchImages()
+    if (!Boolean(this.state.query)) {
+      this.setState({ gallery: [], isLoading: false });
+    }
+    fetchImages(this.state.page)
       .then(({ hits }) => {
         setTimeout(() => {
-          this.setState({ gallery: hits, isLoading: false });
+          this.state.query
+            ? this.setState({ gallery: hits, isLoading: false })
+            : this.setState({ gallery: [], isLoading: false });
         }, 1000);
       })
       .catch(err => {
@@ -29,16 +66,19 @@ export class App extends Component {
       });
   }
   render() {
-    console.log(this.state);
     return (
       <div className="App">
-        <SearchBar />
+        <SearchBar hangleSearch={this.hangleSearch} />
         {this.state.isLoading ? (
-          <span>Loading</span>
+          <Loader />
         ) : (
           <>
             <ImageGallery gallery={this.state.gallery} />
-            <Button isRender={this.state.gallery.length} />
+            <Button
+              loadMore={this.handleLoadMore}
+              isRender={this.state.gallery.length}
+              page={this.state.page}
+            />
           </>
         )}
       </div>

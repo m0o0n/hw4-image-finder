@@ -3,7 +3,6 @@ import ImageGalleryItem from './ImageGalleryItem';
 
 export default class ImageGallery extends Component {
   render() {
-    console.log(this.props);
     return (
       <ul className="ImageGallery">
         {this.props.gallery.map(({ id, webformatURL, tags, largeImageURL }) => {
