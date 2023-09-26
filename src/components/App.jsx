@@ -4,6 +4,7 @@ import Button from './Button';
 import ImageGallery from './ImageGallery';
 import { Loader } from './Loader';
 import SearchBar from './Searchbar';
+
 export class App extends Component {
   state = {
     gallery: null,
@@ -13,6 +14,7 @@ export class App extends Component {
     err: '',
     isLoading: true,
   };
+
   handleLoadMore = () => {
     this.setState(prev => ({ page: prev.page + 1 }));
   };
@@ -31,9 +33,8 @@ export class App extends Component {
             : this.setState(prev => ({
                 gallery: [...prev.gallery, ...data.hits],
               }));
-
           this.setState({ isLoading: false });
-        }, 1000);
+        }, 500);
       });
     } else if (prevState.query !== this.state.query) {
       this.setState({ isLoading: true });
@@ -42,7 +43,6 @@ export class App extends Component {
           this.state.query
             ? this.setState({ gallery: hits })
             : this.setState({ gallery: [] });
-
           this.setState({ isLoading: false });
         }, 1000);
       });
