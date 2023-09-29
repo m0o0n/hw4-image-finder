@@ -19,8 +19,14 @@ export class App extends Component {
     this.setState(prev => ({ page: prev.page + 1 }));
   };
 
-  hangleSearch = e => {
-    this.setState({ query: e, page: 1 });
+  submit = value => {
+    fetchImages(this.state.page, value)
+      .then(data => {
+        this.setState({ gallery: data.hits, query: value });
+      })
+      .catch(err => {
+        this.setState({ err, isLoading: false });
+      });
   };
 
   componentDidUpdate(_, prevState) {
@@ -28,23 +34,11 @@ export class App extends Component {
       this.setState({ isLoading: true });
       fetchImages(this.state.page, this.state.query).then(data => {
         setTimeout(() => {
-          prevState.query !== this.state.query
-            ? this.setState({ gallery: data.hits })
-            : this.setState(prev => ({
-                gallery: [...prev.gallery, ...data.hits],
-              }));
-          this.setState({ isLoading: false });
+          this.setState(prev => ({
+            gallery: [...prev.gallery, ...data.hits],
+            isLoading: false,
+          }));
         }, 500);
-      });
-    } else if (prevState.query !== this.state.query) {
-      this.setState({ isLoading: true });
-      fetchImages(this.state.page, this.state.query).then(({ hits }) => {
-        setTimeout(() => {
-          this.state.query
-            ? this.setState({ gallery: hits })
-            : this.setState({ gallery: [] });
-          this.setState({ isLoading: false });
-        }, 1000);
       });
     }
   }
@@ -59,16 +53,17 @@ export class App extends Component {
           this.state.query
             ? this.setState({ gallery: hits, isLoading: false })
             : this.setState({ gallery: [], isLoading: false });
-        }, 1000);
+        }, 500);
       })
       .catch(err => {
         this.setState({ err, isLoading: false });
       });
   }
+
   render() {
     return (
       <div className="App">
-        <SearchBar hangleSearch={this.hangleSearch} />
+        <SearchBar submit={this.submit} />
         {this.state.isLoading ? (
           <Loader />
         ) : (

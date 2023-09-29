@@ -1,10 +1,21 @@
 import { Component } from 'react';
 
 export default class SearchBar extends Component {
+  state = { serchQuery: '' };
+
+  hangleSearch = value => {
+    this.setState({ serchQuery: value });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.submit(this.state.serchQuery);
+  };
+
   render() {
     return (
       <header className="Searchbar">
-        <form className="SearchForm">
+        <form className="SearchForm" onSubmit={this.handleSubmit}>
           <button type="submit" className="SearchForm-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -18,10 +29,11 @@ export default class SearchBar extends Component {
           <input
             className="SearchForm-input"
             type="text"
+            value={this.state.serchQuery}
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            onChange={e => this.props.hangleSearch(e.target.value)}
+            onChange={e => this.hangleSearch(e.target.value)}
           />
         </form>
       </header>
