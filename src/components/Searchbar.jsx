@@ -1,21 +1,20 @@
-import { Component } from 'react';
+import { useState } from 'react';
 
-export default class SearchBar extends Component {
-  state = { serchQuery: '' };
-
-  hangleSearch = value => {
-    this.setState({ serchQuery: value });
+const SearchBar =(props)=> {
+  const [serchQuery, setSerchQuery] = useState('')
+  const hangleSearch = value => {
+    setSerchQuery(value);
   };
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.submit(this.state.serchQuery);
+    props.submit(serchQuery);
   };
 
-  render() {
+
     return (
       <header className="Searchbar">
-        <form className="SearchForm" onSubmit={this.handleSubmit}>
+        <form className="SearchForm" onSubmit={handleSubmit}>
           <button type="submit" className="SearchForm-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -29,14 +28,14 @@ export default class SearchBar extends Component {
           <input
             className="SearchForm-input"
             type="text"
-            value={this.state.serchQuery}
+            value={serchQuery}
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            onChange={e => this.hangleSearch(e.target.value)}
+            onChange={e => hangleSearch(e.target.value)}
           />
         </form>
       </header>
     );
-  }
 }
+export default SearchBar 

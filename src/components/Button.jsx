@@ -1,11 +1,12 @@
-import { Component } from 'react';
 
-export default class Button extends Component {
-  render() {
-    return this.props.isRender ? (
-      <button className="Button" onClick={this.props.loadMore}>
+
+const Button =(props)=>{
+
+    return props.isRender ? (
+      <button className="Button" onClick={props.loadMore}>
         Load more
       </button>
     ) : null;
-  }
+ 
 }
+export default Button
